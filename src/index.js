@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { Client, IntentsBitField } = require('discord.js')
+const { Client, IntentsBitField, EmbedBuilder } = require('discord.js')
 const { Configuration, OpenAIApi} = require('openai')
 
 const client = new Client({
@@ -15,6 +15,29 @@ client.on('ready', (c) => {
     console.log(`${c.user.username} is ready!`)
 })
 
+// Help Embed
+client.on('interactionCreate', (interaction) => {
+    if (!interaction.isChatInputCommand()) return;
+
+    if (interaction.commandName === 'help'){
+        const embed = new EmbedBuilder()
+        .setTitle('Bot Information')
+        .setDescription('description')
+        .setColor('Random')
+        .addFields({ 
+            name: 'Field Title',
+            value: 'stuff',
+            inline: false,
+         }, {
+            name: 'Field Title',
+            value: 'stuff',
+            inline: false,
+         })
+        interaction.reply({ embeds: [embed]})
+    }
+})
+
+// ChatGPT 
 const configuration = new Configuration({
     apiKey: process.env.CHATGPT_API
 })
@@ -24,6 +47,10 @@ const openai = new OpenAIApi(configuration)
 client.on('messageCreate', async (msg) => {
     if (msg.author.bot) return;
     if (msg.content.startsWith('!')) return;
+    if (msg.channel.id !== process.env.CHANNEL1_ID && 
+        msg.channel.id !== process.env.CHANNEL2_ID &&
+        msg.channel.id !== process.env.CHANNEL3_ID) return; 
+
     let conversationLog = [{ role: 'system', content: "You are a helpful chatbot. Ensure that your responses do not exceed the word limit"}]
 
     await msg.channel.sendTyping();
@@ -45,20 +72,22 @@ client.on('messageCreate', async (msg) => {
         messages: conversationLog,
     })
 
-    msg.reply(res.data.choices[0].message)
+    msg.channel.send(res.data.choices[0].message)
     
 })
 
-client.on('interactionCreate', (interaction) => {
+
+// Coin Flip
+client.on('interactionCreate', async (interaction) => {
     if (!interaction.isChatInputCommand()) return;
 
     if (interaction.commandName === 'coin'){
+        
         if (Math.random() < 0.50){
             interaction.reply('Heads!')
         } else {
             interaction.reply('Tails!')
         }
-        
     }
 })
 
