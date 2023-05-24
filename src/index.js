@@ -22,17 +22,24 @@ client.on('interactionCreate', (interaction) => {
     if (interaction.commandName === 'help'){
         const embed = new EmbedBuilder()
         .setTitle('Bot Information')
-        .setDescription('description')
-        .setColor('Random')
+        .setDescription('Bot with ChatGPT integration. Commands are below. Talk in specified channel to use ChatGPT.')
+        .setColor('#702963')
+        .setThumbnail('https://imgur.com/Se2U6B0.jpeg')
         .addFields({ 
-            name: 'Field Title',
-            value: 'stuff',
+            name: '/help',
+            value: 'Brings up this embed (obviously)',
             inline: false,
          }, {
-            name: 'Field Title',
-            value: 'stuff',
+            name: '/coin',
+            value: 'Flips a coin',
+            inline: false,
+         }, {
+            name: 'More to come',
+            value: ':)',
             inline: false,
          })
+        .setTimestamp()
+        .setFooter({ text: 'Bot made be me (Dennis)' })
         interaction.reply({ embeds: [embed]})
     }
 })
