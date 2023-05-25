@@ -1,7 +1,9 @@
 {
   "dependencies": {
+    "@alpacahq/alpaca-trade-api": "^3.0.1",
     "discord.js": "^14.11.0",
     "dotenv": "^16.0.3",
+    "moment": "^2.29.4",
     "openai": "^3.2.1"
   },
   "name": "discordjs-bot",

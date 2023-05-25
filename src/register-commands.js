@@ -1,7 +1,19 @@
 require('dotenv').config()
-const { REST, Routes } = require('discord.js')
+const { REST, Routes, ApplicationCommandOptionType } = require('discord.js')
 
 const commands = [
+    {
+        name: 'data',
+        description: 'Retrieves market data of specified ticker',
+        options: [
+            {
+                name: 'ticker',
+                description: 'Stock ticker',
+                type: ApplicationCommandOptionType.String,
+                required: true
+            }
+        ]
+    },
     {
         name: 'coin',
         description: 'Flips a coin'

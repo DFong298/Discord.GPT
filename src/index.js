@@ -1,6 +1,8 @@
 require('dotenv').config();
-const { Client, IntentsBitField, EmbedBuilder } = require('discord.js')
-const { Configuration, OpenAIApi} = require('openai')
+const { Client, IntentsBitField, EmbedBuilder } = require('discord.js');
+const { Configuration, OpenAIApi} = require('openai');
+const Alpaca = require("@alpacahq/alpaca-trade-api");
+const moment = require('moment');
 
 const client = new Client({
     intents: [
@@ -11,9 +13,47 @@ const client = new Client({
     ]
 })
 
+const alpaca = new Alpaca({
+    keyId: process.env.ALPACA_ID,
+    secretKey: process.env.ALPACA_KEY,
+    paper: false,
+});
+
 client.on('ready', (c) => {
     console.log(`${c.user.username} is ready!`)
 })
+
+// Market Data
+client.on('interactionCreate', async (interaction) => {
+    if (!interaction.isChatInputCommand()) return;
+
+    if (interaction.commandName === 'data'){
+        const ticker = interaction.options.get('ticker').value.toUpperCase();
+        
+        let bars = alpaca.getBarsV2(
+            ticker,
+            {
+              start: moment().subtract(7, "days").format(),
+              end: moment().subtract(15, "minutes").format(),
+              timeframe: "1Day",
+            },
+            alpaca.configuration
+          );
+          const barset = [];
+
+        for await (let b of bars) {
+            barset.push(b);
+        }
+
+        const week_open = barset[0].OpenPrice;
+        const week_close = barset.slice(-1)[0].ClosePrice;
+        const percent_change = ((week_close - week_open) / week_open) * 100;
+
+        console.log(`${ticker} moved ${percent_change}% over the last 7 days`);
+        console.log(barset[0])
+    }
+})
+
 
 // Help Embed
 client.on('interactionCreate', (interaction) => {
