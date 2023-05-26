@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { Client, IntentsBitField, EmbedBuilder } = require('discord.js');
+const { Client, IntentsBitField, EmbedBuilder, ActivityType } = require('discord.js');
 const { Configuration, OpenAIApi} = require('openai');
 const Alpaca = require("@alpacahq/alpaca-trade-api");
 const moment = require('moment');
@@ -21,6 +21,11 @@ const alpaca = new Alpaca({
 
 client.on('ready', (c) => {
     console.log(`${c.user.username} is ready!`)
+
+    client.user.setActivity({
+        name: 'the world fall apart',
+        type: ActivityType.Watching
+    })
 })
 
 // Market Data
