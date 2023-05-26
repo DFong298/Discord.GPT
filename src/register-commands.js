@@ -15,28 +15,28 @@ const commands = [
             {
                 name: 'time-frame',
                 description: 'Data time frame',
-                type: ApplicationCommandOptionType.Number,
+                type: ApplicationCommandOptionType.String,
                 choices: [
                     {
                         name: 'One day',
-                        value: 1,
+                        value: '1Days',
                     }, 
                     {
                         name: 'One week',
-                        value: 7,
+                        value: '1Week',
                     },
                     {
                         name: 'One month',
-                        value: 30,
+                        value: '1Month',
                     },
                     {
                         name: 'Six months',
-                        value: 180,
+                        value: '6Months',
                     },
                     {
                         name: 'One year',
-                        value: 365,
-                    }
+                        value: '12Months',
+                    },
                 ],
                 required: true
             }

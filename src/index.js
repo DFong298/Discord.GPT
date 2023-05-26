@@ -30,31 +30,31 @@ client.on('interactionCreate', async (interaction) => {
     if (interaction.commandName === 'data'){
         const ticker = interaction.options.get('ticker').value.toUpperCase();
         const timeframe = interaction.options.get('time-frame').value;
-        let timeframeStr;
+        let startInput;
 
         switch (timeframe) {
-            case 1:
-                timeframeStr = '1Day';
+            case '1Days':
+                startInput = moment().subtract(1, "days").format();
                 break;
-            case 7:
-                timeframeStr = '1Week';
+            case '1Week':
+                startInput = moment().subtract(7, "days").format();
                 break
-            case 30:
-                timeframeStr = '1Month';
+            case '1Month':
+                startInput = moment().subtract(30, "days").format();
                 break;
-            case 180:
-                timeframeStr = '6Months';
+            case '6Months':
+                startInput = moment().subtract(180, "days").format();
                 break;
-            case 365:
-                timeframeStr = '1Year';
+            case '12Months': // crashes
+                startInput = moment().subtract(1, "years").format();
         }
         
         let bars = alpaca.getBarsV2(
             ticker,
             {
-              start: moment().subtract(timeframe, "days").format(),
+              start: startInput,
               end: moment().subtract(15, "minutes").format(),
-              timeframe: timeframeStr,
+              timeframe: timeframe,
             },
             alpaca.configuration
           );
@@ -64,12 +64,41 @@ client.on('interactionCreate', async (interaction) => {
             barset.push(b);
         }
 
-        // const week_open = barset[0].OpenPrice;
-        // const week_close = barset[0].ClosePrice;
-        // const percent_change = ((week_close - week_open) / week_open) * 100;
+        const week_open = barset[0].OpenPrice;
+        const week_close = barset[0].ClosePrice;
+        const percent_change = ((week_close - week_open) / week_open) * 100;
+        
+        const dataEmbed = new EmbedBuilder()
+        .setTitle(`${ticker} Market Data`)
+        .setThumbnail('https://i.imgur.com/0VMPq0j.jpeg')
+        .setDescription(`${ticker} moved ${percent_change.toFixed(2)}% in the selected time period.`)
+        .addFields({ 
+            name: 'Current price',
+            value: barset[0].ClosePrice.toFixed(2),
+            inline: false,
+         }, {
+            name: 'Price at start of period',
+            value: barset[0].OpenPrice.toFixed(2),
+            inline: false,
+         }, {
+            name: 'Period high',
+            value: barset[0].HighPrice.toFixed(2),
+            inline: false,
+         }, {
+            name: 'Period low',
+            value: barset[0].LowPrice.toFixed(2),
+            inline: false,
+         })
+        .setTimestamp()
+        .setFooter({ text: `Full data and chart available at https://ca.finance.yahoo.com/quote/${ticker}`})
 
-        // console.log(`${ticker} moved ${percent_change}% in this time period.`);
-        console.log(barset)
+        if (percent_change > 0){
+            dataEmbed.setColor('#50C878')
+        } else if (percent_change < 0) {
+            dataEmbed.setColor('#C41E3A')
+        }
+
+        interaction.reply({ embeds: [dataEmbed]})
     }
 })
 
@@ -93,8 +122,8 @@ client.on('interactionCreate', (interaction) => {
             value: 'Flips a coin',
             inline: false,
          }, {
-            name: 'More to come',
-            value: ':)',
+            name: '/data [ticker] [time frame]',
+            value: 'Provides one bar of market data for ticker in given time frame.',
             inline: false,
          })
         .setTimestamp()
