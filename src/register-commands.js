@@ -11,6 +11,34 @@ const commands = [
                 description: 'Stock ticker',
                 type: ApplicationCommandOptionType.String,
                 required: true
+            },
+            {
+                name: 'time-frame',
+                description: 'Data time frame',
+                type: ApplicationCommandOptionType.Number,
+                choices: [
+                    {
+                        name: 'One day',
+                        value: 1,
+                    }, 
+                    {
+                        name: 'One week',
+                        value: 7,
+                    },
+                    {
+                        name: 'One month',
+                        value: 30,
+                    },
+                    {
+                        name: 'Six months',
+                        value: 180,
+                    },
+                    {
+                        name: 'One year',
+                        value: 365,
+                    }
+                ],
+                required: true
             }
         ]
     },

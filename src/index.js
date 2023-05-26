@@ -29,13 +29,32 @@ client.on('interactionCreate', async (interaction) => {
 
     if (interaction.commandName === 'data'){
         const ticker = interaction.options.get('ticker').value.toUpperCase();
+        const timeframe = interaction.options.get('time-frame').value;
+        let timeframeStr;
+
+        switch (timeframe) {
+            case 1:
+                timeframeStr = '1Day';
+                break;
+            case 7:
+                timeframeStr = '1Week';
+                break
+            case 30:
+                timeframeStr = '1Month';
+                break;
+            case 180:
+                timeframeStr = '6Months';
+                break;
+            case 365:
+                timeframeStr = '1Year';
+        }
         
         let bars = alpaca.getBarsV2(
             ticker,
             {
-              start: moment().subtract(7, "days").format(),
+              start: moment().subtract(timeframe, "days").format(),
               end: moment().subtract(15, "minutes").format(),
-              timeframe: "1Day",
+              timeframe: timeframeStr,
             },
             alpaca.configuration
           );
@@ -45,12 +64,12 @@ client.on('interactionCreate', async (interaction) => {
             barset.push(b);
         }
 
-        const week_open = barset[0].OpenPrice;
-        const week_close = barset.slice(-1)[0].ClosePrice;
-        const percent_change = ((week_close - week_open) / week_open) * 100;
+        // const week_open = barset[0].OpenPrice;
+        // const week_close = barset[0].ClosePrice;
+        // const percent_change = ((week_close - week_open) / week_open) * 100;
 
-        console.log(`${ticker} moved ${percent_change}% over the last 7 days`);
-        console.log(barset[0])
+        // console.log(`${ticker} moved ${percent_change}% in this time period.`);
+        console.log(barset)
     }
 })
 
@@ -60,7 +79,7 @@ client.on('interactionCreate', (interaction) => {
     if (!interaction.isChatInputCommand()) return;
 
     if (interaction.commandName === 'help'){
-        const embed = new EmbedBuilder()
+        const helpEmbed = new EmbedBuilder()
         .setTitle('Bot Information')
         .setDescription('Bot with ChatGPT integration. Commands are below. Talk in specified channel to use ChatGPT.')
         .setColor('#702963')
@@ -80,7 +99,7 @@ client.on('interactionCreate', (interaction) => {
          })
         .setTimestamp()
         .setFooter({ text: 'Bot made be me (Dennis)' })
-        interaction.reply({ embeds: [embed]})
+        interaction.reply({ embeds: [helpEmbed]})
     }
 })
 
